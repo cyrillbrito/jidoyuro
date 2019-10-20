@@ -1,17 +1,17 @@
 import { Request, Response } from "express";
 import { AuthenticatedClient, MarketOrder } from "coinbase-pro";
 
-const key = process.env.CBPRO_KEY;
-const secret = process.env.CBPRO_SECRET;
-const passphrase = process.env.CBPRO_PASSPHRASE;
+const key = process.env.CBPRO_KEY || "";
+const secret = process.env.CBPRO_SECRET || "";
+const passphrase = process.env.CBPRO_PASSPHRASE || "";
 
 const apiURI = "https://api.pro.coinbase.com";
 const sandboxURI = "https://api-public.sandbox.pro.coinbase.com";
 
 const authedClient = new AuthenticatedClient(
-  key ? key : "",
-  secret ? secret : "",
-  passphrase ? passphrase : "",
+  key,
+  secret,
+  passphrase,
   sandboxURI
 );
 
