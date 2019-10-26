@@ -12,7 +12,7 @@ const accessCode = process.env.MBCP_ACCESSCODE || "";
 
 let page: Page;
 (async function() {
-  const browser = await launch();
+  const browser = await launch({ headless: true, defaultViewport: { width: 800, height: 800 } });
   page = await browser.newPage();
 
   sReport("open-login");
@@ -117,6 +117,6 @@ function sReport(s: string): void {
 
 async function eReport(): Promise<void> {
   console.log("[E]", report);
-  await page.screenshot({ path: reportNumber + "-" + report + ".png" });
+  // await page.screenshot({ path: reportNumber + "-" + report + ".png" });
   reportNumber++;
 }
