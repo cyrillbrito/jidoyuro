@@ -11,7 +11,8 @@ const userCode = process.env.MBCP_USERCODE || "";
 const accessCode = process.env.MBCP_ACCESSCODE || "";
 
 let page: Page;
-(async function() {
+
+exports.ynab = async (pubSubEvent: any, context: any) => {
   const browser = await launch({ headless: true, defaultViewport: { width: 800, height: 800 } });
   page = await browser.newPage();
 
@@ -105,7 +106,7 @@ let page: Page;
   await eReport();
 
   await browser.close();
-})();
+};
 
 let report: string;
 let reportNumber = 0;
