@@ -13,7 +13,11 @@ const accessCode = process.env.MBCP_ACCESSCODE || "";
 let page: Page;
 
 exports.ynab = async (pubSubEvent: any, context: any) => {
-  const browser = await launch({ headless: true, defaultViewport: { width: 800, height: 800 } });
+  const browser = await launch({
+    headless: true,
+    defaultViewport: { width: 800, height: 800 },
+    args: ["--no-sandbox"]
+  });
   page = await browser.newPage();
 
   sReport("open-login");

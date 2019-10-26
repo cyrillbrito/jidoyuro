@@ -5,7 +5,11 @@ const userCode = process.env.MBCP_USERCODE || "";
 const accessCode = process.env.MBCP_ACCESSCODE || "";
 let page;
 exports.ynab = async (pubSubEvent, context) => {
-    const browser = await puppeteer_1.launch({ headless: true, defaultViewport: { width: 800, height: 800 } });
+    const browser = await puppeteer_1.launch({
+        headless: true,
+        defaultViewport: { width: 800, height: 800 },
+        args: ["--no-sandbox"]
+    });
     page = await browser.newPage();
     sReport("open-login");
     await page.goto("https://ind.millenniumbcp.pt/_layouts/BCP.SDC.FEP.Foundation.Presentation/Login.aspx");
