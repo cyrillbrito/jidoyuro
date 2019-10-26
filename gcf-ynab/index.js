@@ -4,7 +4,7 @@ const puppeteer_1 = require("puppeteer");
 const userCode = process.env.MBCP_USERCODE || "";
 const accessCode = process.env.MBCP_ACCESSCODE || "";
 let page;
-(async function () {
+exports.ynab = async (pubSubEvent, context) => {
     const browser = await puppeteer_1.launch({ headless: true, defaultViewport: { width: 800, height: 800 } });
     page = await browser.newPage();
     sReport("open-login");
@@ -74,7 +74,7 @@ let page;
     console.log(JSON.stringify(inner));
     await eReport();
     await browser.close();
-})();
+};
 let report;
 let reportNumber = 0;
 function sReport(s) {
@@ -83,6 +83,6 @@ function sReport(s) {
 }
 async function eReport() {
     console.log("[E]", report);
-    await page.screenshot({ path: reportNumber + "-" + report + ".png" });
+    // await page.screenshot({ path: reportNumber + "-" + report + ".png" });
     reportNumber++;
 }
