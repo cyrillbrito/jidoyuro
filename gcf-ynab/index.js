@@ -1,33 +1,38 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const puppeteer_1 = require("puppeteer");
-const userCode = process.env.MBCP_USERCODE || "";
-const accessCode = process.env.MBCP_ACCESSCODE || "";
-const browserPromise = puppeteer_1.launch({
-    headless: true,
-    defaultViewport: { width: 800, height: 800 },
+const puppeteer = require("puppeteer");
+const ynab = require("ynab");
+const mbcpUserCode = process.env.MBCP_USER_CODE || "";
+const mbcpAccessCode = process.env.MBCP_ACCESS_CODE || "";
+const ynabAccessToken = process.env.YNAB_ACCESS_TOKEN || "";
+const ynabAccountId = process.env.YNAB_ACCOUNT_ID || "";
+const browserPromise = puppeteer.launch({
+    headless: false,
+    // defaultViewport: { width: 900, height: 900 },
     args: ["--no-sandbox"]
 });
-const url = "https://ind.millenniumbcp.pt/_layouts/BCP.SDC.FEP.Foundation.Presentation/Login.aspx";
-// let page: Page;
+const ynabApi = new ynab.API(ynabAccessToken);
+let page;
 // (async function() {
 exports.ynab = async (req, res) => {
+    console.time('all');
     const browser = await browserPromise;
     const browserContext = await browser.createIncognitoBrowserContext();
-    const page = await browserContext.newPage();
+    page = await browserContext.newPage();
     sReport("open-login");
-    await page.goto("http://ind.millenniumbcp.pt/");
-    // await page.goto("https://ind.millenniumbcp.pt/");
-    await page.goto(url);
+    await page.goto("https://ind.millenniumbcp.pt/_layouts/BCP.SDC.FEP.Foundation.Presentation/Login.aspx");
+    await eReport();
+    sReport("cookies");
+    await page.click("#btnAcceptS1CookiesV2");
     await eReport();
     sReport("fill-user-code");
-    await page.$eval("#TextBoxLogin_txField", (el, userCode) => (el.value = userCode), userCode);
+    await page.$eval("#TextBoxLogin_txField", (el, userCode) => el.value = userCode, mbcpUserCode);
     await eReport();
     sReport("open-access-code");
     await page.click("#btnPositions");
     await eReport();
     sReport("wait-a-bit");
-    await page.waitFor(8000);
+    await page.waitFor(3000);
     await eReport();
     sReport("fill-access-code");
     for (let i = 1; i < 4; i++) {
@@ -40,7 +45,7 @@ exports.ynab = async (req, res) => {
             return;
         }
         const pos = +lbl.charAt(0) - 1;
-        const code = accessCode.charAt(pos);
+        const code = mbcpAccessCode.charAt(pos);
         const txtHandle = await page.$("#txtPosition_" + i);
         if (!txtHandle) {
             return;
@@ -68,23 +73,45 @@ exports.ynab = async (req, res) => {
     if (!table) {
         return;
     }
-    const inner = await table.evaluate(t => {
+    let movements = await table.evaluate(t => {
         const tbody = t.childNodes[1];
         const all = [];
-        tbody.childNodes.forEach(itemNode => {
+        for (let i = 1; i < tbody.childNodes.length - 1; i++) {
+            const itemNode = tbody.childNodes[i];
             all.push({
                 date1: itemNode.childNodes[1] ? (itemNode.childNodes[1].textContent || "").trim() : "",
                 date2: itemNode.childNodes[2] ? (itemNode.childNodes[2].textContent || "").trim() : "",
                 description: itemNode.childNodes[3] ? (itemNode.childNodes[3].textContent || "").trim() : "",
-                amount: itemNode.childNodes[4] ? +(itemNode.childNodes[4].textContent || "").trim() : 0
+                amount: itemNode.childNodes[4]
+                    ? +(itemNode.childNodes[4].textContent || "")
+                        .trim()
+                        .replace(".", "")
+                        .replace(",", ".")
+                    : 0,
+                amount2: itemNode.childNodes[4] ? (itemNode.childNodes[4].textContent || "").trim() : "--22"
             });
-        });
+        }
         return all;
     });
-    console.log(JSON.stringify(inner));
-    res.send(inner);
+    console.log(JSON.stringify(movements));
     await eReport();
-    await browserContext.close();
+    movements = [...movements, ...movements, ...movements];
+    const transactions = [];
+    for (const movement of movements) {
+        const importNumber = transactions.filter(t => t.date === movement.date1 && t.payee_name === movement.description && t.amount === movement.amount).length + 1;
+        transactions.push({
+            account_id: ynabAccountId,
+            date: movement.date1,
+            amount: movement.amount,
+            payee_name: movement.description,
+            cleared: ynab.SaveTransaction.ClearedEnum.Cleared,
+            import_id: `${movement.date1}:${movement.description}:${movement.amount}:${importNumber}`
+        });
+    }
+    res.send(transactions);
+    console.timeEnd('all');
+    // ynabApi.transactions.createTransactions("default", { transactions: transactions });
+    // await browserContext.close();
 };
 // })();
 let report;
@@ -95,6 +122,6 @@ function sReport(s) {
 }
 async function eReport() {
     console.log("[E]", report);
-    // await page.screenshot({ path: reportNumber + "-" + report + ".png" });
+    await page.screenshot({ path: reportNumber + "-" + report + ".png" });
     reportNumber++;
 }
