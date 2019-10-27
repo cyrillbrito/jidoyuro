@@ -16,6 +16,8 @@ exports.ynab = async (req, res) => {
     const browserContext = await browser.createIncognitoBrowserContext();
     const page = await browserContext.newPage();
     sReport("open-login");
+    await page.goto("http://ind.millenniumbcp.pt/");
+    // await page.goto("https://ind.millenniumbcp.pt/");
     await page.goto(url);
     await eReport();
     sReport("fill-user-code");
