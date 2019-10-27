@@ -10,18 +10,21 @@ interface Movement {
 const userCode = process.env.MBCP_USERCODE || "";
 const accessCode = process.env.MBCP_ACCESSCODE || "";
 
-let page: Page;
+const url = "https://ind.millenniumbcp.pt/_layouts/BCP.SDC.FEP.Foundation.Presentation/Login.aspx";
 
+// let page: Page;
+
+// (async function() {
 exports.ynab = async (pubSubEvent: any, context: any) => {
   const browser = await launch({
     headless: true,
     defaultViewport: { width: 800, height: 800 },
     args: ["--no-sandbox"]
   });
-  page = await browser.newPage();
+  const page = await browser.newPage();
 
   sReport("open-login");
-  await page.goto("https://ind.millenniumbcp.pt/_layouts/BCP.SDC.FEP.Foundation.Presentation/Login.aspx");
+  await page.goto(url);
   await eReport();
 
   sReport("fill-user-code");
@@ -111,6 +114,7 @@ exports.ynab = async (pubSubEvent: any, context: any) => {
 
   await browser.close();
 };
+// })();
 
 let report: string;
 let reportNumber = 0;

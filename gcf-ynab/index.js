@@ -3,16 +3,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const puppeteer_1 = require("puppeteer");
 const userCode = process.env.MBCP_USERCODE || "";
 const accessCode = process.env.MBCP_ACCESSCODE || "";
-let page;
+const url = "https://ind.millenniumbcp.pt/_layouts/BCP.SDC.FEP.Foundation.Presentation/Login.aspx";
+// let page: Page;
+// (async function() {
 exports.ynab = async (pubSubEvent, context) => {
     const browser = await puppeteer_1.launch({
         headless: true,
         defaultViewport: { width: 800, height: 800 },
         args: ["--no-sandbox"]
     });
-    page = await browser.newPage();
+    const page = await browser.newPage();
     sReport("open-login");
-    await page.goto("https://ind.millenniumbcp.pt/_layouts/BCP.SDC.FEP.Foundation.Presentation/Login.aspx");
+    await page.goto(url);
     await eReport();
     sReport("fill-user-code");
     await page.$eval("#TextBoxLogin_txField", (el, userCode) => (el.value = userCode), userCode);
@@ -79,6 +81,7 @@ exports.ynab = async (pubSubEvent, context) => {
     await eReport();
     await browser.close();
 };
+// })();
 let report;
 let reportNumber = 0;
 function sReport(s) {
