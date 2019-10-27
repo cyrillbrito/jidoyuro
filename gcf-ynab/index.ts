@@ -109,9 +109,11 @@ exports.ynab = async (req: express.Request, res: express.Response) => {
   }
   await eReport();
 
-  res.send(transactions);
+  sReport("send-ynab");
+  const response = await ynabApi.transactions.createTransactions("default", { transactions: transactions });
+  await eReport();
 
-  // ynabApi.transactions.createTransactions("default", { transactions: transactions });
+  res.send({ transactions, response });
 
   await browserContext.close();
 };

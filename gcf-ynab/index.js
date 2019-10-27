@@ -83,8 +83,10 @@ exports.ynab = async (req, res) => {
         });
     }
     await eReport();
-    res.send(transactions);
-    // ynabApi.transactions.createTransactions("default", { transactions: transactions });
+    sReport("send-ynab");
+    const response = await ynabApi.transactions.createTransactions("default", { transactions: transactions });
+    await eReport();
+    res.send({ transactions, response });
     await browserContext.close();
 };
 let report;
