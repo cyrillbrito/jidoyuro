@@ -7,15 +7,11 @@ const mbcpAccessCode = process.env.MBCP_ACCESS_CODE || "";
 const ynabAccessToken = process.env.YNAB_ACCESS_TOKEN || "";
 const ynabAccountId = process.env.YNAB_ACCOUNT_ID || "";
 const browserPromise = puppeteer.launch({
-    headless: false,
-    // defaultViewport: { width: 900, height: 900 },
     args: ["--no-sandbox"]
 });
 const ynabApi = new ynab.API(ynabAccessToken);
 let page;
-// (async function() {
 exports.ynab = async (req, res) => {
-    console.time('all');
     const browser = await browserPromise;
     const browserContext = await browser.createIncognitoBrowserContext();
     page = await browserContext.newPage();
@@ -31,71 +27,49 @@ exports.ynab = async (req, res) => {
     sReport("open-access-code");
     await page.click("#btnPositions");
     await eReport();
-    sReport("wait-a-bit");
-    await page.waitFor(3000);
+    sReport("wait-for-labels");
+    await page.waitForSelector("#lblPosition_1");
     await eReport();
     sReport("fill-access-code");
     for (let i = 1; i < 4; i++) {
-        const lblHandle = await page.$("#lblPosition_" + i);
-        if (!lblHandle) {
-            return;
-        }
-        const lbl = await lblHandle.evaluate(el => el.textContent);
+        const lbl = await page.$eval("#lblPosition_" + i, el => el.textContent);
         if (!lbl) {
             return;
         }
         const pos = +lbl.charAt(0) - 1;
         const code = mbcpAccessCode.charAt(pos);
-        const txtHandle = await page.$("#txtPosition_" + i);
-        if (!txtHandle) {
-            return;
-        }
-        await txtHandle.evaluate((el, code) => (el.value = code), code);
+        await page.$eval("#txtPosition_" + i, (el, code) => { el.value = code; }, code);
     }
     await eReport();
     sReport("click-validate");
     await page.click("#btnValidate");
     await eReport();
-    sReport("wait-more-moves");
+    sReport("wait-more-movements");
     await page.waitForSelector("#ctl00_ctl00_PlaceHolderMainBase_PlaceHolderMain__bcpTransactionContainer_ctl01_UltimosMovimentos_divOperationInfo_hlMaisMovimentos");
     await eReport();
-    sReport("click-more-moves");
+    sReport("click-more-movements");
     await page.click("#ctl00_ctl00_PlaceHolderMainBase_PlaceHolderMain__bcpTransactionContainer_ctl01_UltimosMovimentos_divOperationInfo_hlMaisMovimentos");
     await eReport();
-    sReport("wait-csv");
+    sReport("wait-movements");
     await page.waitForSelector("#ctl00_ctl00_PlaceHolderMainBase_PlaceHolderMain__bcpTransactionContainer_ctl01_divOperationInfo_gridMovements");
     await eReport();
-    sReport("wait-a-bit-cenas");
-    await page.waitFor(3000);
-    await eReport();
     sReport("read-movements");
-    const table = await page.$("#ctl00_ctl00_PlaceHolderMainBase_PlaceHolderMain__bcpTransactionContainer_ctl01_divOperationInfo_gridMovements");
-    if (!table) {
-        return;
-    }
-    let movements = await table.evaluate(t => {
-        const tbody = t.childNodes[1];
-        const all = [];
+    let movements = await page.$eval("#ctl00_ctl00_PlaceHolderMainBase_PlaceHolderMain__bcpTransactionContainer_ctl01_divOperationInfo_gridMovements tbody", tbody => {
+        const movements = [];
         for (let i = 1; i < tbody.childNodes.length - 1; i++) {
-            const itemNode = tbody.childNodes[i];
-            all.push({
-                date1: itemNode.childNodes[1] ? (itemNode.childNodes[1].textContent || "").trim() : "",
-                date2: itemNode.childNodes[2] ? (itemNode.childNodes[2].textContent || "").trim() : "",
-                description: itemNode.childNodes[3] ? (itemNode.childNodes[3].textContent || "").trim() : "",
-                amount: itemNode.childNodes[4]
-                    ? +(itemNode.childNodes[4].textContent || "")
-                        .trim()
-                        .replace(".", "")
-                        .replace(",", ".")
-                    : 0,
-                amount2: itemNode.childNodes[4] ? (itemNode.childNodes[4].textContent || "").trim() : "--22"
+            const cells = tbody.childNodes[i].childNodes;
+            movements.push({
+                date1: (cells[1].textContent || "").trim(),
+                date2: (cells[2].textContent || "").trim(),
+                description: (cells[3].textContent || "").trim(),
+                amount: +(cells[4].textContent || "").trim().replace(".", "").replace(",", ".")
             });
         }
-        return all;
+        return movements;
     });
-    console.log(JSON.stringify(movements));
     await eReport();
     movements = [...movements, ...movements, ...movements];
+    sReport("map-movements");
     const transactions = [];
     for (const movement of movements) {
         const importNumber = transactions.filter(t => t.date === movement.date1 && t.payee_name === movement.description && t.amount === movement.amount).length + 1;
@@ -108,12 +82,11 @@ exports.ynab = async (req, res) => {
             import_id: `${movement.date1}:${movement.description}:${movement.amount}:${importNumber}`
         });
     }
+    await eReport();
     res.send(transactions);
-    console.timeEnd('all');
     // ynabApi.transactions.createTransactions("default", { transactions: transactions });
-    // await browserContext.close();
+    await browserContext.close();
 };
-// })();
 let report;
 let reportNumber = 0;
 function sReport(s) {
@@ -122,6 +95,6 @@ function sReport(s) {
 }
 async function eReport() {
     console.log("[E]", report);
-    await page.screenshot({ path: reportNumber + "-" + report + ".png" });
+    // await page.screenshot({ path: reportNumber + "-" + report + ".png" });
     reportNumber++;
 }
