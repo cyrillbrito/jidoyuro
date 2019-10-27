@@ -11,7 +11,7 @@ const browserPromise = puppeteer_1.launch({
 const url = "https://ind.millenniumbcp.pt/_layouts/BCP.SDC.FEP.Foundation.Presentation/Login.aspx";
 // let page: Page;
 // (async function() {
-exports.ynab = async (pubSubEvent, context) => {
+exports.ynab = async (req, res) => {
     const browser = await browserPromise;
     const browserContext = await browser.createIncognitoBrowserContext();
     const page = await browserContext.newPage();
@@ -80,6 +80,7 @@ exports.ynab = async (pubSubEvent, context) => {
         return all;
     });
     console.log(JSON.stringify(inner));
+    res.send(inner);
     await eReport();
     await browserContext.close();
 };

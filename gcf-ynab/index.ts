@@ -1,4 +1,5 @@
 import { launch, Page } from "puppeteer";
+import { Request, Response } from "express";
 
 interface Movement {
   date1: string;
@@ -21,7 +22,7 @@ const url = "https://ind.millenniumbcp.pt/_layouts/BCP.SDC.FEP.Foundation.Presen
 // let page: Page;
 
 // (async function() {
-exports.ynab = async (pubSubEvent: any, context: any) => {
+exports.ynab = async (req: Request, res: Response) => {
   const browser = await browserPromise;
   const browserContext = await browser.createIncognitoBrowserContext();
   const page = await browserContext.newPage();
@@ -113,6 +114,7 @@ exports.ynab = async (pubSubEvent: any, context: any) => {
   });
 
   console.log(JSON.stringify(inner));
+  res.send(inner);
   await eReport();
 
   await browserContext.close();
