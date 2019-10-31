@@ -54,7 +54,7 @@ exports.ynab = async (req, res) => {
     await page.waitForSelector("#ctl00_ctl00_PlaceHolderMainBase_PlaceHolderMain__bcpTransactionContainer_ctl01_divOperationInfo_gridMovements");
     await eReport();
     sReport("read-movements");
-    let movements = await page.$eval("#ctl00_ctl00_PlaceHolderMainBase_PlaceHolderMain__bcpTransactionContainer_ctl01_divOperationInfo_gridMovements tbody", tbody => {
+    const movements = await page.$eval("#ctl00_ctl00_PlaceHolderMainBase_PlaceHolderMain__bcpTransactionContainer_ctl01_divOperationInfo_gridMovements tbody", tbody => {
         const movements = [];
         for (let i = 1; i < tbody.childNodes.length - 1; i++) {
             const cells = tbody.childNodes[i].childNodes;
@@ -68,7 +68,6 @@ exports.ynab = async (req, res) => {
         return movements;
     });
     await eReport();
-    movements = [...movements, ...movements, ...movements];
     sReport("map-movements");
     const transactions = [];
     for (const movement of movements) {
