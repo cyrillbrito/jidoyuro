@@ -107,8 +107,8 @@ exports.ynab = async (req: express.Request, res: express.Response) => {
 
     transactions.push({
       account_id: ynabAccountId,
-      date: movement.date, // invert date
-      amount: +movement.amount.replace('.', '').replace(',', '.'),
+      date: movement.date,
+      amount: +iidAmount * 10,
       payee_name: movement.description,
       cleared: ynab.SaveTransaction.ClearedEnum.Cleared,
       import_id: `${iidDate}${iidAmount}${iidBalance}${iidDescription}`.substring(0, 36)
