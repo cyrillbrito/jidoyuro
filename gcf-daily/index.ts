@@ -13,7 +13,7 @@ const authedClient = new AuthenticatedClient(
   key,
   secret,
   passphrase,
-  sandboxURI
+  apiURI
 );
 
 exports.daily = async (req: Request, res: Response) => {

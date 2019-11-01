@@ -7,7 +7,7 @@ const passphrase = process.env.CBPRO_PASSPHRASE || "";
 const funds = process.env.FUNDS || "";
 const apiURI = "https://api.pro.coinbase.com";
 const sandboxURI = "https://api-public.sandbox.pro.coinbase.com";
-const authedClient = new coinbase_pro_1.AuthenticatedClient(key, secret, passphrase, sandboxURI);
+const authedClient = new coinbase_pro_1.AuthenticatedClient(key, secret, passphrase, apiURI);
 exports.daily = async (req, res) => {
     const order = {
         type: "market",
