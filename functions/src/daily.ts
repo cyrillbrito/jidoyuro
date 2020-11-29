@@ -23,7 +23,7 @@ export const daily = functions.https.onRequest(async (req, res) => {
     side: "buy",
     product_id: "BTC-EUR",
     size: null,
-    funds
+    funds,
   };
 
   const cbProResponse = await authedClient.placeOrder(order);

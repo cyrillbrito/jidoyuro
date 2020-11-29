@@ -16,7 +16,7 @@ const ynabBudgetId = process.env.YNAB_BUDGET_ID || '';
 const ynabAccountId = process.env.YNAB_ACCOUNT_ID || '';
 
 const browserPromise = puppeteer.launch({
-  args: ['--no-sandbox']
+  args: ['--no-sandbox'],
 });
 
 const ynabApi = new ynab.API(ynabAccessToken);
@@ -57,7 +57,7 @@ export const ynabImport = functions.https.onRequest(async (req, res) => {
     }
     const pos = +lbl.charAt(0) - 1;
     const code = mbcpAccessCode.charAt(pos);
-    await page.$eval('#txtPosition_' + i, (el: any, code: any) => { el.value = code }, code);
+    await page.$eval('#txtPosition_' + i, (el: any, code2: any) => { el.value = code2 }, code);
   }
   await eReport();
 
@@ -79,17 +79,17 @@ export const ynabImport = functions.https.onRequest(async (req, res) => {
 
   sReport('read-movements');
   const movements = await page.$eval('#ctl00_ctl00_PlaceHolderMainBase_PlaceHolderMain__bcpTransactionContainer_ctl01_divOperationInfo_gridMovements tbody', (tbody: any) => {
-    const movements: Movement[] = [];
+    const movements2: Movement[] = [];
     for (let i = 1; i < tbody.childNodes.length - 1; i++) {
       const cells = tbody.childNodes[i].childNodes;
-      movements.push({
+      movements2.push({
         date: (cells[1].textContent || "").trim(),
         description: (cells[3].textContent || "").trim(),
         amount: (cells[4].textContent || "").trim(),
-        balance: (cells[5].textContent || "").trim()
+        balance: (cells[5].textContent || "").trim(),
       });
     }
-    return movements;
+    return movements2;
   });
   await eReport();
 
@@ -111,7 +111,7 @@ export const ynabImport = functions.https.onRequest(async (req, res) => {
       amount: +iidAmount * 10,
       payee_name: movement.description,
       cleared: ynab.SaveTransaction.ClearedEnum.Cleared,
-      import_id: `${iidDate}${iidAmount}${iidBalance}${iidDescription}`.substring(0, 36)
+      import_id: `${iidDate}${iidAmount}${iidBalance}${iidDescription}`.substring(0, 36),
     });
   }
   await eReport();
