@@ -1,4 +1,4 @@
-import * as express from 'express';
+import * as functions from 'firebase-functions';
 import * as puppeteer from 'puppeteer';
 import * as ynab from 'ynab';
 
@@ -23,7 +23,7 @@ const ynabApi = new ynab.API(ynabAccessToken);
 
 let page: puppeteer.Page;
 
-exports.ynab = async (req: express.Request, res: express.Response) => {
+export const ynabImport = functions.https.onRequest(async (req, res) => {
 
   const browser = await browserPromise;
   const browserContext = await browser.createIncognitoBrowserContext();
@@ -38,7 +38,7 @@ exports.ynab = async (req: express.Request, res: express.Response) => {
   await eReport();
 
   sReport('fill-user-code');
-  await page.$eval('#TextBoxLogin_txField', (el: any, userCode) => el.value = userCode, mbcpUserCode);
+  await page.$eval('#TextBoxLogin_txField', (el: any, userCode: any) => el.value = userCode, mbcpUserCode);
   await eReport();
 
   sReport('open-access-code');
@@ -57,7 +57,7 @@ exports.ynab = async (req: express.Request, res: express.Response) => {
     }
     const pos = +lbl.charAt(0) - 1;
     const code = mbcpAccessCode.charAt(pos);
-    await page.$eval('#txtPosition_' + i, (el: any, code) => { el.value = code }, code);
+    await page.$eval('#txtPosition_' + i, (el: any, code: any) => { el.value = code }, code);
   }
   await eReport();
 
@@ -78,7 +78,7 @@ exports.ynab = async (req: express.Request, res: express.Response) => {
   await eReport();
 
   sReport('read-movements');
-  const movements = await page.$eval('#ctl00_ctl00_PlaceHolderMainBase_PlaceHolderMain__bcpTransactionContainer_ctl01_divOperationInfo_gridMovements tbody', tbody => {
+  const movements = await page.$eval('#ctl00_ctl00_PlaceHolderMainBase_PlaceHolderMain__bcpTransactionContainer_ctl01_divOperationInfo_gridMovements tbody', (tbody: any) => {
     const movements: Movement[] = [];
     for (let i = 1; i < tbody.childNodes.length - 1; i++) {
       const cells = tbody.childNodes[i].childNodes;
@@ -128,9 +128,10 @@ exports.ynab = async (req: express.Request, res: express.Response) => {
   res.send({ movements, transactions, response });
 
   await browserContext.close();
-};
+});
 
 let report: string;
+// @ts-ignore
 let reportNumber = 0;
 
 function sReport(s: string): void {

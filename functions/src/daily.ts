@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import * as functions from 'firebase-functions';
 import { AuthenticatedClient, MarketOrder } from "coinbase-pro";
 
 const key = process.env.CBPRO_KEY || "";
@@ -7,7 +7,7 @@ const passphrase = process.env.CBPRO_PASSPHRASE || "";
 const funds = process.env.FUNDS || "";
 
 const apiURI = "https://api.pro.coinbase.com";
-const sandboxURI = "https://api-public.sandbox.pro.coinbase.com";
+// const sandboxURI = "https://api-public.sandbox.pro.coinbase.com";
 
 const authedClient = new AuthenticatedClient(
   key,
@@ -16,7 +16,7 @@ const authedClient = new AuthenticatedClient(
   apiURI
 );
 
-exports.daily = async (req: Request, res: Response) => {
+export const daily = functions.https.onRequest(async (req, res) => {
 
   const order: MarketOrder = {
     type: "market",
@@ -29,4 +29,4 @@ exports.daily = async (req: Request, res: Response) => {
   const cbProResponse = await authedClient.placeOrder(order);
 
   res.send(cbProResponse);
-};
+});

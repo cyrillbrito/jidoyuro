@@ -1,7 +1,0 @@
-{
-  "name": "jidoyuro-gcf-daily",
-  "version": "0.0.2",
-  "dependencies": {
-    "coinbase-pro": "^0.9.0"
-  }
-}
