@@ -16,6 +16,5 @@ https://firebase.google.com/docs/functions/get-started
 
 ## Running locally
 
-Run time config is not working
-firebase functions:config:get > .runtimeconfig.json
+firebase functions:config:get | ac .runtimeconfig.json
 

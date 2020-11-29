@@ -1,4 +1,4 @@
-import * as functions from 'firebase-functions';
+import { Request, Response } from 'firebase-functions';
 import { AuthenticatedClient, MarketOrder } from "coinbase-pro";
 
 const key = process.env.CBPRO_KEY || "";
@@ -16,7 +16,7 @@ const authedClient = new AuthenticatedClient(
   apiURI
 );
 
-export const daily = functions.https.onRequest(async (req, res) => {
+export const dailyFn = async (req: Request, res: Response) => {
 
   const order: MarketOrder = {
     type: "market",
@@ -29,4 +29,4 @@ export const daily = functions.https.onRequest(async (req, res) => {
   const cbProResponse = await authedClient.placeOrder(order);
 
   res.send(cbProResponse);
-});
+};
