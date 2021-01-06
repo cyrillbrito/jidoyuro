@@ -18,3 +18,10 @@ https://firebase.google.com/docs/functions/get-started
 
 firebase functions:config:get | ac .runtimeconfig.json
 
+
+
+## Using Google Cloud Run
+
+The new ynab imported will use cloud run. For this the code will actually be dockerized.
+
+https://nielskersic.medium.com/automatic-monitoring-application-with-nodejs-playwright-and-google-sheets-a62875b1ce98
