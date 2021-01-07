@@ -36,7 +36,7 @@ export class JidoyuroYnab {
         // amount: +movement.amount,
         payee_name: movement.description,
         cleared: SaveTransaction.ClearedEnum.Cleared,
-        import_id: `${date}${movement.amount}${movement.balance}${movement.description}`.substring(0, 36),
+        import_id: this.importId(movement),
       });
     }
 
@@ -50,4 +50,11 @@ export class JidoyuroYnab {
     // }
   }
 
+  private importId(movement: BankMovement): string {
+    const date = movement.date.toISOString().split('T')[0].replace(/-/g, '');
+    const description = movement.description.replace(/[^A-Za-z]|COMPRA|CONTACTLESS/g, '');
+    const amount = movement.amount.toString().replace('.', '');
+    const balance = movement.balance.toString().replace('.', '');
+    return `${date}${amount}${balance}${description}`.substring(0, 36);
+  }
 }

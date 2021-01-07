@@ -31,8 +31,8 @@ export class ActivoImporter {
     await page.fill('#BlueMainLoginControlCdm1_txtUserCode', this.config.userCode);
     await page.press('#lnkBtnShort', 'Enter');
 
-    await page.waitForTimeout(3000);
-
+    // Fill multichannel code
+    await page.waitForSelector('#BlueMainLoginControlCdm1_lbl_1_position');
     for (let i = 1; i <= 3; i++) {
       const labelElement = await page.$(`#BlueMainLoginControlCdm1_lbl_${i}_position`);
       const label = await labelElement?.textContent();
@@ -44,25 +44,21 @@ export class ActivoImporter {
       await page.fill(`#BlueMainLoginControlCdm1_txt_${i}_position`, n.toString());
     }
 
-    await page.waitForTimeout(3000);
-
+    // Press login
     await page.press('#lnkBtnLogOn', 'Enter');
 
-    await page.waitForTimeout(5000);
-
+    // Skip modal
+    await page.waitForSelector('#_lnkBtnConfirm');
     await page.press('#_lnkBtnConfirm', 'Enter');
 
-    await page.waitForTimeout(8000);
-
+    // Read table
+    await page.waitForSelector('#ctl02_gvMoviments');
     const trs = await page.$$(`#ctl02_gvMoviments tbody tr`);
     const bankMovements: BankMovement[] = [];
 
+    // Parse each line of the table
     for (const tr of trs) {
-
       const tds = await tr.$$('td');
-
-      console.log(await tds[0].innerText());
-
       bankMovements.push({
         date: this.parseDate(await tds[0].innerText()),
         description: await tds[2].innerText(),
@@ -71,12 +67,8 @@ export class ActivoImporter {
       });
     }
 
-
-    console.log('bm', JSON.stringify(bankMovements));
-
+    // Insert movements on YNAB
     this.ynab.createTransactions(bankMovements);
-
-
 
     await browser.close();
   }
