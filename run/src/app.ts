@@ -5,7 +5,7 @@ const PORT = process.env.PORT || 8080;
 const app = express();
 
 app.get('/', async (request: Request, response: Response) => {
-  await new ActivoImporter({ multichannelCode: '', userCode: '' }).import();
+  await new ActivoImporter({ multichannelCode: '', userCode: '', ynab: { accessToken: '', accountId: '' } }).import();
   response.send('OK');
 });
 

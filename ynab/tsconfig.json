@@ -5,7 +5,7 @@
     "sourceMap": true,
     "strict": true,
     "target": "esnext",
-    "esModuleInterop": true,
+    "declaration": true
   },
   "include": [
     "src"
