@@ -1,5 +1,5 @@
-import { chromium, ElementHandle, Page } from 'playwright';
-import { BankMovement, JidoyuroYnab, JidoyuroYnabConfig } from 'jidoyuro-ynab';
+import { chromium } from 'playwright';
+import { BankMovement, JidoyuroYnab, JidoyuroYnabConfig } from './ynab';
 
 export interface Config {
   userCode: string;
