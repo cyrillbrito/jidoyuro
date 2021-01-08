@@ -10,7 +10,7 @@ const app = express();
 app.get('/', async (request: Request, response: Response) => {
   // await new ActivoImporter({ multichannelCode: '', userCode: '', ynab: { accessToken: '', accountId: '' } }).import();
   const [secret] = await smsc.getSecret({
-    name: 'sample-test',
+    name: 'projects/47980551395/secrets/sample-test'
   });
 
   console.log(secret);
