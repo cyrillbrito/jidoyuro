@@ -9,13 +9,19 @@ const app = express();
 
 app.get('/', async (request: Request, response: Response) => {
   // await new ActivoImporter({ multichannelCode: '', userCode: '', ynab: { accessToken: '', accountId: '' } }).import();
-  const [secret] = await smsc.getSecret({
-    name: 'projects/47980551395/secrets/sample-test'
-  });
 
-  console.log(secret);
+  try {
+    const [secret] = await smsc.getSecret({
+      name: 'projects/47980551395/secrets/sample-test'
+    });
+    console.log(secret);
+    response.send('OK ' + secret);
+  } catch (e) {
+    console.log('eeee', e);
+    response.send('eeee ' + e);
+  }
 
-  response.send('OK ' + secret);
+
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
