@@ -12,7 +12,7 @@ app.get('/', async (request: Request, response: Response) => {
 
   try {
     const [secret] = await smsc.getSecret({
-      name: 'projects/47980551395/secrets/sample-test'
+      name: 'projects/47980551395/secrets/sample-test/versions/latest'
     });
     console.log(secret);
     response.send('OK ' + secret);
