@@ -11,6 +11,7 @@ app.get('/', async (request: Request, response: Response) => {
 
   try {
     const config: ActivoImporterConfig = {
+      debug: await configManager.get('debug') === 'true',
       userCode: await configManager.get('activo-bank-user-code'),
       multichannelCode: await configManager.get('activo-bank-multichannel-code'),
       ynab: {
