@@ -2,6 +2,7 @@ import { API as YnabApi, SaveTransaction, } from 'ynab';
 
 export interface JidoyuroYnabConfig {
   accessToken: string;
+  budgetId: string;
   accountId: string;
 }
 
@@ -42,12 +43,7 @@ export class JidoyuroYnab {
 
     console.log(JSON.stringify(transactions));
 
-    // let response;
-    // try {
-    //   response = await this.ynabApi.transactions.createTransactions(this.config.ynab.budget_id, { transactions: transactions });
-    // } catch (e) {
-    //   console.log(e);
-    // }
+    // response = await this.ynabApi.transactions.createTransactions(this.config.ynab.budget_id, { transactions: transactions });
   }
 
   private importId(movement: BankMovement): string {

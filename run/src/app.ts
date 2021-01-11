@@ -15,6 +15,7 @@ app.get('/', async (request: Request, response: Response) => {
       multichannelCode: await configManager.get('activo-bank-multichannel-code'),
       ynab: {
         accessToken: await configManager.get('ynab-access-token'),
+        budgetId: await configManager.get('ynab-budget-id'),
         accountId: await configManager.get('ynab-account-id'),
       },
     };
