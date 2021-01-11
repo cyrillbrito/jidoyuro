@@ -1,4 +1,4 @@
-FROM node:14-alpine
+FROM node
 # ENV PLAYWRIGHT_BROWSERS_PATH=0
 WORKDIR /usr/src/app
 COPY . .
