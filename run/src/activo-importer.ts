@@ -130,7 +130,3 @@ export class ActivoImporter {
     return Number(s.replace('.', '').replace(',', '.'));
   }
 }
-
-(async () => {
-  await (new ActivoImporter({ userCode: 'CRB80503', multichannelCode: '4937686', debug: true, ynab: { accessToken: 'access', budgetId: '', accountId: 'account' } })).import();
-})();
