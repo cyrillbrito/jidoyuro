@@ -18,12 +18,15 @@ export class ActivoImporter {
 
   public async import(): Promise<void> {
 
-    console.log('traceeee', 1);
+    console.log('traceeee', 1, this.config);
 
     // Browser initialization
     const options = this.config.debug ? { headless: false, slowMo: 100 } : {};
+    console.log('traceeee', 1.1);
     const browser = await chromium.launch(options);
+    console.log('traceeee', 1.2);
     const context = await browser.newContext();
+    console.log('traceeee', 1.3);
     const page = await context.newPage();
 
     console.log('traceeee', 2);
@@ -128,3 +131,6 @@ export class ActivoImporter {
   }
 }
 
+(async () => {
+  await (new ActivoImporter({ userCode: 'CRB80503', multichannelCode: '4937686', debug: true, ynab: { accessToken: 'access', budgetId: '', accountId: 'account' } })).import();
+})();
