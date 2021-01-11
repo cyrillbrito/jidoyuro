@@ -1,7 +1,7 @@
 import { chromium } from 'playwright';
 import { BankMovement, JidoyuroYnab, JidoyuroYnabConfig } from './ynab';
 
-export interface Config {
+export interface ActivoImporterConfig {
   userCode: string;
   multichannelCode: string;
   debug?: boolean;
@@ -12,7 +12,7 @@ export class ActivoImporter {
 
   private ynab: JidoyuroYnab;
 
-  constructor(private config: Config) {
+  constructor(private config: ActivoImporterConfig) {
     this.ynab = new JidoyuroYnab(this.config.ynab);
   }
 
