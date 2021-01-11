@@ -25,3 +25,9 @@ firebase functions:config:get | ac .runtimeconfig.json
 The new ynab imported will use cloud run. For this the code will actually be dockerized.
 
 https://nielskersic.medium.com/automatic-monitoring-application-with-nodejs-playwright-and-google-sheets-a62875b1ce98
+
+### Locally
+
+Create a copy of the enviroment/sample with the name local.json and fill the configs
+
+run $ npm start

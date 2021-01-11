@@ -5,9 +5,13 @@ export class ConfigurationManager {
   private smsc: SecretManagerServiceClient;
   private cache: { [key: string]: string };
 
-  constructor() {
+  constructor(local?: string) {
     this.smsc = new SecretManagerServiceClient();
-    this.cache = {};
+    if (local) {
+      this.cache = require(`../environment/${local}`);
+    } else {
+      this.cache = {};
+    }
   }
 
   public async get(key: string): Promise<string> {

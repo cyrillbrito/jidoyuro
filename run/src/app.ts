@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import { ActivoImporter, ActivoImporterConfig } from './activo-importer';
 import { ConfigurationManager } from './configuration-manager';
 
-const configManager = new ConfigurationManager();
+const configManager = new ConfigurationManager(process.argv[2]);
 const PORT = process.env.PORT || 8080;
 const app = express();
 
@@ -20,7 +20,7 @@ app.get('/', async (request: Request, response: Response) => {
       },
     };
 
-    new ActivoImporter(config).import();
+    await new ActivoImporter(config).import();
 
     response.send('OK!');
 

@@ -2,7 +2,7 @@
   "name": "run",
   "private": true,
   "scripts": {
-    "start": "tsc --watch",
+    "start": "tsc && node dist/app.js local",
     "build": "tsc"
   },
   "dependencies": {
