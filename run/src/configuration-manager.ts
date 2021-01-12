@@ -22,18 +22,15 @@ export class ConfigurationManager {
       return this.cache[key];
     }
 
-    const result = await this.smsc.accessSecretVersion({ name: `projects/47980551395/secrets/${key}/versions/latest` });
-    const secret = result[0].payload?.data;
+    const [version] = await this.smsc.accessSecretVersion({ name: `projects/47980551395/secrets/${key}/versions/latest` });
+    const secret = version.payload?.data?.toString();
 
-    console.log('result', JSON.stringify(result));
-    console.log('result2', result);
-
-    if (typeof secret === "string") {
-      console.log('ConfigurationManager', key, result);
+    if (secret) {
+      console.log('ConfigurationManager', key, secret);
       this.cache[key] = secret;
       return secret;
     } else {
-      console.log('ConfigurationManager', key, '404');
+      console.log('ConfigurationManager', key, '404', version);
       return '';
     }
   }
