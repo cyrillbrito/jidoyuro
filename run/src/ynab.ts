@@ -41,10 +41,7 @@ export class JidoyuroYnab {
       });
     }
 
-    console.log(JSON.stringify(transactions));
-
     const response = await this.ynabApi.transactions.createTransactions(this.config.budgetId, { transactions });
-
     return response.data;
   }
 
