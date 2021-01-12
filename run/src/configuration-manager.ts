@@ -25,6 +25,9 @@ export class ConfigurationManager {
     const result = await this.smsc.accessSecretVersion({ name: `projects/47980551395/secrets/${key}/versions/latest` });
     const secret = result[0].payload?.data;
 
+    console.log('result', JSON.stringify(result));
+    console.log('result2', result);
+
     if (typeof secret === "string") {
       console.log('ConfigurationManager', key, result);
       this.cache[key] = secret;
