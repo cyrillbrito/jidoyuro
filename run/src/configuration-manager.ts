@@ -8,6 +8,7 @@ export class ConfigurationManager {
   constructor(local?: string) {
     this.smsc = new SecretManagerServiceClient();
     if (local) {
+      console.log('ENVIROMENT ÇLOCAL?', local);
       this.cache = require(`../environment/${local}`);
     } else {
       this.cache = {};
@@ -17,6 +18,7 @@ export class ConfigurationManager {
   public async get(key: string): Promise<string> {
 
     if (this.cache[key]) {
+      console.log('ConfigurationManager', key, this.cache[key]);
       return this.cache[key];
     }
 
@@ -24,9 +26,11 @@ export class ConfigurationManager {
     const secret = result[0].payload?.data;
 
     if (typeof secret === "string") {
+      console.log('ConfigurationManager', key, result);
       this.cache[key] = secret;
       return secret;
     } else {
+      console.log('ConfigurationManager', key, '404');
       return '';
     }
   }
