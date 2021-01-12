@@ -21,9 +21,9 @@ app.get('/', async (request: Request, response: Response) => {
       },
     };
 
-    await new ActivoImporter(config).import();
+    const result = await new ActivoImporter(config).import();
 
-    response.send('OK!');
+    response.send(result);
 
   } catch (e) {
     console.log('ERROR-001', e);

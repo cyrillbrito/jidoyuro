@@ -16,7 +16,7 @@ export class ActivoImporter {
     this.ynab = new JidoyuroYnab(this.config.ynab);
   }
 
-  public async import(): Promise<void> {
+  public async import(): Promise<any> {
 
     console.log('traceeee', 1, this.config);
 
@@ -110,12 +110,13 @@ export class ActivoImporter {
     console.log('traceeee', 16);
 
     // Insert movements on YNAB
-    this.ynab.createTransactions(bankMovements);
+    const response = await this.ynab.createTransactions(bankMovements);
 
     console.log('traceeee', 17);
 
-
     await browser.close();
+
+    return response;
   }
 
   private parseDate(s: string): Date {

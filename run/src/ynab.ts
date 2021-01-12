@@ -21,7 +21,7 @@ export class JidoyuroYnab {
     this.ynabApi = new YnabApi(this.config.accessToken);
   }
 
-  public async createTransactions(movements: BankMovement[]): Promise<void> {
+  public async createTransactions(movements: BankMovement[]): Promise<any> {
 
     const transactions: SaveTransaction[] = [];
 
@@ -43,7 +43,9 @@ export class JidoyuroYnab {
 
     console.log(JSON.stringify(transactions));
 
-    // response = await this.ynabApi.transactions.createTransactions(this.config.ynab.budget_id, { transactions: transactions });
+    const response = await this.ynabApi.transactions.createTransactions(this.config.budgetId, { transactions });
+
+    return response.data;
   }
 
   private importId(movement: BankMovement): string {
