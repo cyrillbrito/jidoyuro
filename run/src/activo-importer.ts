@@ -1,4 +1,4 @@
-import { chromium } from 'playwright';
+import { webkit } from 'playwright-webkit';
 import { BankMovement, JidoyuroYnab, JidoyuroYnabConfig } from './ynab';
 
 export interface ActivoImporterConfig {
@@ -23,7 +23,7 @@ export class ActivoImporter {
     // Browser initialization
     const options = this.config.debug ? { headless: false, slowMo: 100 } : {};
     console.log('traceeee', 1.1);
-    const browser = await chromium.launch(options);
+    const browser = await webkit.launch(options);
     console.log('traceeee', 1.2);
     const context = await browser.newContext();
     console.log('traceeee', 1.3);

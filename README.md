@@ -30,4 +30,8 @@ https://nielskersic.medium.com/automatic-monitoring-application-with-nodejs-play
 
 Create a copy of the enviroment/sample with the name local.json and fill the configs
 
+https://cloud.google.com/cloud-build/docs/build-debug-locally
+
+install choco install gcloudsdk
+
 run $ npm start
