@@ -8,7 +8,7 @@ export class Configuration {
   constructor() {
     this.smsc = new SecretManagerServiceClient();
     if (process.argv[2]) {
-      this.cache = require(`../environment/${process.argv[2]}`);
+      this.cache = require(`../../environment/${process.argv[2]}`);
     } else {
       this.cache = {};
     }

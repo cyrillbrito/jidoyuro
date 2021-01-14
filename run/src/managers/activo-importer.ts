@@ -1,13 +1,6 @@
-import { webkit } from 'playwright-webkit';
+import { chromium } from 'playwright-chromium';
 import { Configuration } from './configuration';
-import { BankMovement, JidoyuroYnabConfig, Ynab } from './ynab';
-
-export interface ActivoImporterConfig {
-  userCode: string;
-  multichannelCode: string;
-  debug?: boolean;
-  ynab: JidoyuroYnabConfig;
-}
+import { BankMovement, Ynab } from './ynab';
 
 export class ActivoImporter {
 
@@ -22,7 +15,7 @@ export class ActivoImporter {
 
     // Browser initialization
     const options = debug ? { headless: false, slowMo: 100 } : {};
-    const browser = await webkit.launch(options);
+    const browser = await chromium.launch(options);
     const context = await browser.newContext();
     const page = await context.newPage();
 
