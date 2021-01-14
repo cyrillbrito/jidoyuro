@@ -1,5 +1,6 @@
 import { webkit } from 'playwright-webkit';
-import { BankMovement, JidoyuroYnab, JidoyuroYnabConfig } from './ynab';
+import { Configuration } from './configuration';
+import { BankMovement, JidoyuroYnabConfig, Ynab } from './ynab';
 
 export interface ActivoImporterConfig {
   userCode: string;
@@ -10,16 +11,17 @@ export interface ActivoImporterConfig {
 
 export class ActivoImporter {
 
-  private ynab: JidoyuroYnab;
-
-  constructor(private config: ActivoImporterConfig) {
-    this.ynab = new JidoyuroYnab(this.config.ynab);
-  }
+  constructor(
+    private config: Configuration,
+    private ynab: Ynab,
+  ) { }
 
   public async import(): Promise<any> {
 
+    const debug = await this.config.get('debug');
+
     // Browser initialization
-    const options = this.config.debug ? { headless: false, slowMo: 100 } : {};
+    const options = debug ? { headless: false, slowMo: 100 } : {};
     const browser = await webkit.launch(options);
     const context = await browser.newContext();
     const page = await context.newPage();
@@ -27,12 +29,15 @@ export class ActivoImporter {
     // Open login page
     await page.goto('https://ind.activobank.pt/_loginV2/BlueMainLoginCdm.aspx?ReturnUrl=https%3a%2f%2find.activobank.pt%2fpt%2fprivate%2fdia-a-dia%2fPages%2fdia-a-dia.aspx')
 
+    const userCode = await this.config.get('activo-bank-user-code');
+
     // Fill user code
-    await page.fill('#BlueMainLoginControlCdm1_txtUserCode', this.config.userCode);
+    await page.fill('#BlueMainLoginControlCdm1_txtUserCode', userCode);
     await page.press('#lnkBtnShort', 'Enter');
 
     // Fill multichannel code
     await page.waitForSelector('#BlueMainLoginControlCdm1_lbl_1_position');
+    const multichannelCode = await this.config.get('activo-bank-multichannel-code');
     for (let i = 1; i <= 3; i++) {
 
       const labelElement = await page.$(`#BlueMainLoginControlCdm1_lbl_${i}_position`);
@@ -41,7 +46,7 @@ export class ActivoImporter {
       if (!label) { return; }
 
       const multichannelPos = +label.charAt(0) - 1;
-      const n = this.config.multichannelCode[multichannelPos];
+      const n = multichannelCode[multichannelPos];
 
       await page.fill(`#BlueMainLoginControlCdm1_txt_${i}_position`, n.toString());
     }

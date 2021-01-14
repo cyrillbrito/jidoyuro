@@ -1,14 +1,14 @@
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 
-export class ConfigurationManager {
+export class Configuration {
 
   private smsc: SecretManagerServiceClient;
   private cache: { [key: string]: string };
 
-  constructor(local?: string) {
+  constructor() {
     this.smsc = new SecretManagerServiceClient();
-    if (local) {
-      this.cache = require(`../environment/${local}`);
+    if (process.argv[2]) {
+      this.cache = require(`../environment/${process.argv[2]}`);
     } else {
       this.cache = {};
     }

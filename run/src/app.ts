@@ -1,34 +1,19 @@
 import express, { Request, Response } from 'express';
-import { ActivoImporter, ActivoImporterConfig } from './activo-importer';
-import { ConfigurationManager } from './configuration-manager';
+import { Container } from './container';
+import { ActivoImporter } from './managers/activo-importer';
+import { BcpImporter } from './managers/bcp-importer';
 
-const configManager = new ConfigurationManager(process.argv[2]);
 const PORT = process.env.PORT || 8080;
 const app = express();
 
+app.get('/ynab/activo-import', async (request: Request, response: Response) => {
+  const activoImporter = Container.get<ActivoImporter>('ActivoImporter');
+  response.send(await activoImporter.import());
+});
 
-app.get('/', async (request: Request, response: Response) => {
-
-  try {
-    const config: ActivoImporterConfig = {
-      debug: await configManager.get('debug') === 'true',
-      userCode: await configManager.get('activo-bank-user-code'),
-      multichannelCode: await configManager.get('activo-bank-multichannel-code'),
-      ynab: {
-        accessToken: await configManager.get('ynab-access-token'),
-        budgetId: await configManager.get('ynab-budget-id'),
-        accountId: await configManager.get('ynab-account-id'),
-      },
-    };
-
-    const result = await new ActivoImporter(config).import();
-
-    response.send(result);
-
-  } catch (e) {
-    console.log('ERROR-001', e);
-    response.send('ERROR-001' + e);
-  }
+app.get('/ynab/bcp-import', async (request: Request, response: Response) => {
+  const bcpImporter = Container.get<BcpImporter>('BcpImporter');
+  response.send(await bcpImporter.import());
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -1,10 +1,5 @@
 import { API as YnabApi, SaveTransaction, } from 'ynab';
-
-export interface JidoyuroYnabConfig {
-  accessToken: string;
-  budgetId: string;
-  accountId: string;
-}
+import { Configuration } from './configuration';
 
 export interface BankMovement {
   date: Date;
@@ -13,12 +8,14 @@ export interface BankMovement {
   balance: number;
 }
 
-export class JidoyuroYnab {
+export class Ynab {
 
-  private ynabApi: YnabApi;
+  private ynabApi$: Promise<YnabApi>;
 
-  constructor(private config: JidoyuroYnabConfig) {
-    this.ynabApi = new YnabApi(this.config.accessToken);
+  constructor(private config: Configuration) {
+    this.ynabApi$ = this.config.get('ynab-access-token').then(accessToken => {
+      return new YnabApi(accessToken);
+    });
   }
 
   public async createTransactions(movements: BankMovement[]): Promise<any> {
@@ -30,18 +27,21 @@ export class JidoyuroYnab {
       // const date = `${movement.date.getFullYear()}-${movement.date.getMonth() + 1}-${movement.date.getDate()}`;
       const date = movement.date.toISOString().split('T')[0];
 
+      const accountId = await this.config.get('ynab-account-id');
       transactions.push({
-        account_id: this.config.accountId,
+        account_id: accountId,
         date,
         amount: movement.amount * 1000,
-        // amount: +movement.amount,
         payee_name: movement.description,
         cleared: SaveTransaction.ClearedEnum.Cleared,
         import_id: this.importId(movement),
       });
     }
 
-    const response = await this.ynabApi.transactions.createTransactions(this.config.budgetId, { transactions });
+    const ynabApi = await this.ynabApi$;
+    const budgetId = await this.config.get('ynab-budget-id');
+
+    const response = await ynabApi.transactions.createTransactions(budgetId, { transactions });
     return response.data;
   }
 
