@@ -11,7 +11,7 @@ export class ActivoImporter {
 
   public async import(): Promise<any> {
 
-    const debug = await this.config.get('debug');
+    const debug = await this.config.getBoolean('debug');
 
     // Browser initialization
     const options = debug ? { headless: false, slowMo: 100 } : {};
@@ -22,9 +22,8 @@ export class ActivoImporter {
     // Open login page
     await page.goto('https://ind.activobank.pt/_loginV2/BlueMainLoginCdm.aspx?ReturnUrl=https%3a%2f%2find.activobank.pt%2fpt%2fprivate%2fdia-a-dia%2fPages%2fdia-a-dia.aspx')
 
-    const userCode = await this.config.get('activo-bank-user-code');
-
     // Fill user code
+    const userCode = await this.config.get('activo-bank-user-code');
     await page.fill('#BlueMainLoginControlCdm1_txtUserCode', userCode);
     await page.press('#lnkBtnShort', 'Enter');
 
@@ -38,8 +37,8 @@ export class ActivoImporter {
 
       if (!label) { return; }
 
-      const multichannelPos = +label.charAt(0) - 1;
-      const n = multichannelCode[multichannelPos];
+      const pos = +label[0] - 1;
+      const n = multichannelCode[pos];
 
       await page.fill(`#BlueMainLoginControlCdm1_txt_${i}_position`, n.toString());
     }
@@ -60,6 +59,7 @@ export class ActivoImporter {
     for (const tr of trs) {
 
       const tds = await tr.$$('td');
+
       bankMovements.push({
         date: this.parseDate(await tds[0].innerText()),
         description: await tds[2].innerText(),
@@ -69,7 +69,8 @@ export class ActivoImporter {
     }
 
     // Insert movements on YNAB
-    const response = await this.ynab.createTransactions(bankMovements);
+    const accountId = await this.config.get('ynab-account-id');
+    const response = await this.ynab.createTransactions(bankMovements, accountId);
 
     await browser.close();
 

@@ -30,4 +30,8 @@ export class Configuration {
       return '';
     }
   }
+
+  public async getBoolean(key: string): Promise<boolean> {
+    return await this.get(key) === 'true';
+  }
 }

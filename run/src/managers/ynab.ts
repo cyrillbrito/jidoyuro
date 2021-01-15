@@ -18,16 +18,14 @@ export class Ynab {
     });
   }
 
-  public async createTransactions(movements: BankMovement[]): Promise<any> {
+  public async createTransactions(movements: BankMovement[], accountId: string): Promise<any> {
 
     const transactions: SaveTransaction[] = [];
 
     for (const movement of movements) {
 
-      // const date = `${movement.date.getFullYear()}-${movement.date.getMonth() + 1}-${movement.date.getDate()}`;
       const date = movement.date.toISOString().split('T')[0];
 
-      const accountId = await this.config.get('ynab-account-id');
       transactions.push({
         account_id: accountId,
         date,
