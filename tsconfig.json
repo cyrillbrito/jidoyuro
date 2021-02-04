@@ -5,6 +5,6 @@
     "lib": ["ES2020", "DOM"],
     "strict": true,
     "strictNullChecks": false,
-    "target": "ES2020"
+    "target": "ES2019"
   }
 }

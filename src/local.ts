@@ -1,11 +1,13 @@
-import { Request, Response } from 'express';
 import { AbImport } from './managers/activo-bank';
+import { SetEnv } from './managers/environment';
 import { BcpImport } from './managers/millennium-bcp';
 
-
-export async function ynab(req: Request, resp: Response) {
+async function ynab() {
   const ab = await BcpImport();
   const bcp = await AbImport();
-  resp.send({ ab, bcp });
+  console.log(JSON.stringify(ab));
+  console.log(JSON.stringify(bcp));
 }
 
+SetEnv('local');
+ynab();

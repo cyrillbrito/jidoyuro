@@ -1,5 +1,5 @@
-import { API as YnabApi, SaveTransaction, } from 'ynab';
-import { Configuration } from './configuration';
+import { API, SaveTransaction, SaveTransactionsResponseData, } from 'ynab';
+import { GetEnvString } from './environment';
 
 export interface BankMovement {
   date: Date;
@@ -8,46 +8,31 @@ export interface BankMovement {
   balance: number;
 }
 
-export class Ynab {
+export async function CreateYnabTransactions(movements: BankMovement[], accountId: string): Promise<SaveTransactionsResponseData> {
 
-  private ynabApi$: Promise<YnabApi>;
+  const accessToken = await GetEnvString('ynab-access-token');
+  const budgetId = await GetEnvString('ynab-budget-id');
 
-  constructor(private config: Configuration) {
-    this.ynabApi$ = this.config.get('ynab-access-token').then(accessToken => {
-      return new YnabApi(accessToken);
-    });
-  }
+  const api = new API(accessToken);
 
-  public async createTransactions(movements: BankMovement[], accountId: string): Promise<any> {
+  const transactions = movements.map(movement => ({
+    account_id: accountId,
+    date: movement.date.toISOString().split('T')[0],
+    amount: movement.amount * 1000,
+    payee_name: movement.description,
+    cleared: SaveTransaction.ClearedEnum.Cleared,
+    import_id: importId(movement),
+  }));
 
-    const transactions: SaveTransaction[] = [];
+  const response = await api.transactions.createTransactions(budgetId, { transactions });
 
-    for (const movement of movements) {
+  return response.data;
+}
 
-      const date = movement.date.toISOString().split('T')[0];
-
-      transactions.push({
-        account_id: accountId,
-        date,
-        amount: movement.amount * 1000,
-        payee_name: movement.description,
-        cleared: SaveTransaction.ClearedEnum.Cleared,
-        import_id: this.importId(movement),
-      });
-    }
-
-    const ynabApi = await this.ynabApi$;
-    const budgetId = await this.config.get('ynab-budget-id');
-
-    const response = await ynabApi.transactions.createTransactions(budgetId, { transactions });
-    return response.data;
-  }
-
-  private importId(movement: BankMovement): string {
-    const date = movement.date.toISOString().split('T')[0].replace(/-/g, '');
-    const description = movement.description.replace(/[^A-Za-z]|COMPRA|CONTACTLESS/g, '');
-    const amount = movement.amount.toString().replace('.', '');
-    const balance = movement.balance.toString().replace('.', '');
-    return `${date}${amount}${balance}${description}`.substring(0, 36);
-  }
+function importId(movement: BankMovement): string {
+  const date = movement.date.toISOString().split('T')[0].replace(/-/g, '');
+  const description = movement.description.replace(/[^A-Za-z]|COMPRA|CONTACTLESS/g, '');
+  const amount = movement.amount.toString().replace('.', '');
+  const balance = movement.balance.toString().replace('.', '');
+  return `${date}${amount}${balance}${description}`.substring(0, 36);
 }
