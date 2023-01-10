@@ -15,7 +15,7 @@
   "main": "lib/index.js",
   "dependencies": {
     "coinbase-pro": "^0.9.0",
-    "firebase-admin": "^9.2.0",
+    "firebase-admin": "^11.4.1",
     "firebase-functions": "^3.11.0",
     "puppeteer": "^5.5.0",
     "ynab": "^1.20.0"
